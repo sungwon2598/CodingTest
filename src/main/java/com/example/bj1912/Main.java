@@ -9,13 +9,23 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int n = Integer.parseInt(br.readLine());
 
-        int arr[][] = new int[n][n];
+        int arr[] = new int[n];
 
-        int max = 0;
-        for (int i = 0; i <= n; i++) {
-            for (int j = i; j <= n; j++) {
-
-            }
+        String input[] = br.readLine().split(" ");
+        for (int i = 0; i < n; i++) {
+            arr[i] = Integer.parseInt(input[i]);
         }
+        System.out.println(maxSubArray(arr));
+    }
+    public static int maxSubArray(int[] nums) {
+        int maxSoFar = nums[0];
+        int maxEndingHere = nums[0];
+
+        for (int i = 1; i < nums.length; i++) {
+            maxEndingHere = Math.max(nums[i], maxEndingHere + nums[i]);
+            maxSoFar = Math.max(maxSoFar, maxEndingHere);
+        }
+
+        return maxSoFar;
     }
 }
