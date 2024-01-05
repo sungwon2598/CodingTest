@@ -23,7 +23,9 @@ public class Main {
 
         for (int i = 1; i < nums.length; i++) {
             maxEndingHere = Math.max(nums[i], maxEndingHere + nums[i]);
+            System.out.print("현재 위치로 끝나는 부분 배열 최대합 : " + maxEndingHere + "  ");
             maxSoFar = Math.max(maxSoFar, maxEndingHere);
+            System.out.println("지금까지 최대합 : " + maxSoFar);
         }
 
         return maxSoFar;
