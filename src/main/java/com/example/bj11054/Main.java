@@ -41,7 +41,7 @@ public class Main {
             max = Math.max(max, dp1[i] + dp2[i]);
         }
 
-        System.out.println(max-1);
+        System.out.println(max - 1);
     }
 
 }
