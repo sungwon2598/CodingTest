@@ -1,4 +1,4 @@
-package com.example.smaple;
+package com.example.bj14503;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,21 +36,26 @@ public class Main {
         }
 
         while (turnOn) {
+
             if (map[x][y] == 0) {
                 claenHere();
             }
-
             if (isExistNotClean()) {
                 backward();
             } else {
-                turnLeft();
-                if (isNotCleanAndNotWallFront()) {
-                    forward();
+                boolean can = true;
+                while (can) {
+                    turnLeft();
+                    if (isNotCleanAndNotWallFront()) {
+                        forward();
+                        can = false;
+                    }
                 }
             }
         }
 
         System.out.println(clean);
+
     }
 
     private static void claenHere() {
@@ -59,66 +64,61 @@ public class Main {
     }
 
     private static void forward() {
-        if (d == 0 && x > 0) {
-            x--;
-        } else if (d == 1 && y < m - 1) {
-            y++;
-        } else if (d == 2 && x < n - 1) {
-            x++;
-        } else if (d == 3 && y > 0) {
+        if (d == 0) {
             y--;
+        } else if (d == 1) {
+            x++;
+        } else if (d == 2) {
+            y++;
+        } else if (d == 3) {
+            x--;
         }
     }
 
     private static void backward() {
-        if (d == 0 && x < n - 1) {
-            x++;
-        } else if (d == 1 && y > 0) {
-            y--;
-        } else if (d == 2 && x > 0) {
-            x--;
-        } else if (d == 3 && y < m - 1) {
+        if (d == 0) {
             y++;
+        } else if (d == 1) {
+            x--;
+        } else if (d == 2) {
+            y--;
+        } else if (d == 3) {
+            x++;
         }
+        // 후진한 뒤 벽이라면 작동을 멈춘다
         if (map[x][y] == 1) {
             turnOn = false;
         }
     }
 
     private static void turnLeft() {
-        d = (d + 3) % 4;
+        if (d == 0) {
+            d = 3;
+        } else if (d == 1) {
+            d = 0;
+        } else if (d == 2) {
+            d = 1;
+        } else if (d == 3) {
+            d = 2;
+        }
     }
 
     private static boolean isExistNotClean() {
-        boolean allCleanedOrWalled = true;
-        if (x > 0) {
-            allCleanedOrWalled &= (map[x - 1][y] != 0);
-        }
-        if (y > 0) {
-            allCleanedOrWalled &= (map[x][y - 1] != 0);
-        }
-        if (x < n - 1) {
-            allCleanedOrWalled &= (map[x + 1][y] != 0);
-        }
-        if (y < m - 1) {
-            allCleanedOrWalled &= (map[x][y + 1] != 0);
-        }
-        return allCleanedOrWalled;
+        return (map[x + 1][y] != 0 && map[x - 1][y] != 0 && map[x][y + 1] != 0 && map[x][y - 1] != 0);
     }
 
     private static boolean isNotCleanAndNotWallFront() {
-        if (d == 0 && x > 0) {
-            return map[x - 1][y] == 0;
-        } else if (d == 1 && y < m - 1) {
-            return map[x][y + 1] == 0;
-        } else if (d == 2 && x < n - 1) {
-            return map[x + 1][y] == 0;
-        } else if (d == 3 && y > 0) {
-            return map[x][y - 1] == 0;
+        if (d == 0 && map[x][y - 1] == 0) {
+            return true;
+        } else if (d == 1 && map[x + 1][y] == 0) {
+            return true;
+        } else if (d == 2 && map[x][y + 1] == 0) {
+            return true;
+        } else if (d == 3 && map[x - 1][y] == 0) {
+            return true;
+        } else {
+            return false;
         }
-        return false;
     }
+
 }
-
-
-
