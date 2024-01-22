@@ -1,124 +1,118 @@
 package com.example.smaple;
 
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Main {
-    private static int n; // 높이
-    private static int m; // 너비
-
-    private static int x; // 로봇청소기 x좌표
-    private static int y; // 로봇청소기 y좌표
-    private static int d; // 방향
-    private static int map[][]; // 0:청소되지 않은 빈칸  1:벽  2:청소된 빈칸
-    private static boolean turnOn = true;
-
-    private static int clean = 0; // 청소한 칸 수
+    private static int n;
+    private static int d = 1;
+    private static int[][] map;
+    // 방향 벡터: 상, 우, 하, 좌
+    private static Queue<Node> queue = new LinkedList<>();
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String input1[] = br.readLine().split(" ");
-        n = Integer.parseInt(input1[0]); // 높이
-        m = Integer.parseInt(input1[1]); // 너비
+        n = Integer.parseInt(br.readLine());
+        map = new int[n][n];
 
-        String input2[] = br.readLine().split(" ");
-        x = Integer.parseInt(input2[0]); // 로봇청소기 초기 좌표
-        y = Integer.parseInt(input2[1]);
-        d = Integer.parseInt(input2[2]); // 방향
-
-        map = new int[n][m];
-        for (int i = 0; i < n; i++) {
-            String input3[] = br.readLine().split(" ");
-            for (int j = 0; j < m; j++) {
-                map[i][j] = Integer.parseInt(input3[j]);
-            }
+        int k = Integer.parseInt(br.readLine());
+        for (int i = 0; i < k; i++) {
+            String[] input = br.readLine().split(" ");
+            int y = Integer.parseInt(input[0]) - 1;
+            int x = Integer.parseInt(input[1]) - 1;
+            map[y][x] = 1; // 사과 위치를 1로 표시
         }
 
-        while (turnOn) {
-            if (map[x][y] == 0) {
-                claenHere();
+        HashMap<Integer, String> turn = new HashMap<>();
+        int l = Integer.parseInt(br.readLine());
+        for (int i = 0; i < l; i++) {
+            String[] input2 = br.readLine().split(" ");
+            int a = Integer.parseInt(input2[0]);
+            String b = input2[1];
+            turn.put(a, b);
+        }
+
+        int time = 0;
+        int x = 0;
+        int y = 0;
+        map[y][x] = 2; // 뱀의 초기 위치를 2로 표시
+        queue.offer(new Node(x, y));
+
+        int[] dx = {0, 1, 0, -1};
+        int[] dy = {-1, 0, 1, 0};
+
+        while (true) {
+            time++;
+            x += dx[d];
+            y += dy[d];
+
+            if (gameOver(x, y)) {
+                break;
             }
 
-            if (isExistNotClean()) {
-                backward();
+            if (!queue.contains(new Node(x, y))) {
+                queue.offer(new Node(x, y));
+                if (map[y][x] == 1) {
+                    map[y][x] = 0; // 사과 먹음
+                } else {
+                    Node tail = queue.poll();
+                    map[tail.y][tail.x] = 0; // 꼬리 제거
+                }
+                map[y][x] = 2; // 뱀 머리 이동
             } else {
-                turnLeft();
-                if (isNotCleanAndNotWallFront()) {
-                    forward();
+                break; // 자신의 몸과 충돌
+            }
+
+            if (turn.containsKey(time)) {
+                String direction = turn.get(time);
+                if (direction.equals("L")) {
+                    d = (d + 3) % 4;
+                } else {
+                    d = (d + 1) % 4;
                 }
             }
         }
 
-        System.out.println(clean);
+        System.out.println(time);
     }
 
-    private static void claenHere() {
-        map[x][y] = 2;
-        clean++;
+    public static boolean gameOver(int x, int y) {
+        return x < 0 || y < 0 || x >= n || y >= n;
     }
 
-    private static void forward() {
-        if (d == 0 && x > 0) {
-            x--;
-        } else if (d == 1 && y < m - 1) {
-            y++;
-        } else if (d == 2 && x < n - 1) {
-            x++;
-        } else if (d == 3 && y > 0) {
-            y--;
-        }
-    }
+    private static class Node {
+        int x;
+        int y;
 
-    private static void backward() {
-        if (d == 0 && x < n - 1) {
-            x++;
-        } else if (d == 1 && y > 0) {
-            y--;
-        } else if (d == 2 && x > 0) {
-            x--;
-        } else if (d == 3 && y < m - 1) {
-            y++;
+        public Node(int x, int y) {
+            this.x = x;
+            this.y = y;
         }
-        if (map[x][y] == 1) {
-            turnOn = false;
-        }
-    }
 
-    private static void turnLeft() {
-        d = (d + 3) % 4;
-    }
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+            Node node = (Node) obj;
+            return x == node.x && y == node.y;
+        }
 
-    private static boolean isExistNotClean() {
-        boolean allCleanedOrWalled = true;
-        if (x > 0) {
-            allCleanedOrWalled &= (map[x - 1][y] != 0);
+        @Override
+        public int hashCode() {
+            return 31 * x + y;
         }
-        if (y > 0) {
-            allCleanedOrWalled &= (map[x][y - 1] != 0);
-        }
-        if (x < n - 1) {
-            allCleanedOrWalled &= (map[x + 1][y] != 0);
-        }
-        if (y < m - 1) {
-            allCleanedOrWalled &= (map[x][y + 1] != 0);
-        }
-        return allCleanedOrWalled;
-    }
-
-    private static boolean isNotCleanAndNotWallFront() {
-        if (d == 0 && x > 0) {
-            return map[x - 1][y] == 0;
-        } else if (d == 1 && y < m - 1) {
-            return map[x][y + 1] == 0;
-        } else if (d == 2 && x < n - 1) {
-            return map[x + 1][y] == 0;
-        } else if (d == 3 && y > 0) {
-            return map[x][y - 1] == 0;
-        }
-        return false;
     }
 }
+
 
 
 
