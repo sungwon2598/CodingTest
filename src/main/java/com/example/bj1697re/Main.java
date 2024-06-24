@@ -1,4 +1,4 @@
-package com.example.bj1697;
+package com.example.bj1697re;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,6 +39,6 @@ public class Main {
                 q.add(next * 2);
             }
         }
-        System.out.println(visited[]);
+
     }
 }
